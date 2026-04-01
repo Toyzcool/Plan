@@ -1,0 +1,454 @@
+import { useState } from "react";
+
+const categories = [
+  {
+    id: "recommend",
+    icon: "✅",
+    title: "推荐食物",
+    subtitle: "低脂 · 补铁 · 高蛋白",
+    color: "#2d6a4f",
+    bgColor: "#d8f3dc",
+    items: [
+      {
+        group: "优质蛋白（每餐必须有）",
+        emoji: "🥩",
+        foods: [
+          { name: "鸡胸肉", note: "去皮，蒸或煮，每餐100g左右" },
+          { name: "鱼肉", note: "鲈鱼、鳕鱼、龙利鱼，清蒸最佳" },
+          { name: "虾仁", note: "白灼或清炒，避免油焖" },
+          { name: "鸡蛋", note: "每天1-2个，水煮蛋或蒸蛋，少吃煎蛋" },
+          { name: "豆腐/豆干", note: "嫩豆腐蒸或煮汤，避免油豆腐" },
+        ],
+      },
+      {
+        group: "补铁食物（术前重点）",
+        emoji: "🩸",
+        foods: [
+          { name: "猪肝", note: "每周2-3次，每次50g，卤或清炒" },
+          { name: "鸭血/猪血", note: "血豆腐汤，补铁效果好" },
+          { name: "瘦牛肉", note: "选里脊部位，炖煮为主，控制量" },
+          { name: "黑木耳", note: "凉拌或煮汤，植物性补铁" },
+          { name: "红枣", note: "每天3-5颗，辅助补血" },
+          { name: "菠菜", note: "焯水后食用，搭配富含维C的食物促进铁吸收" },
+        ],
+      },
+      {
+        group: "蔬菜（每餐大量）",
+        emoji: "🥬",
+        foods: [
+          { name: "西兰花", note: "蒸或水煮，富含维C促进铁吸收" },
+          { name: "胡萝卜", note: "蒸煮均可，富含维A" },
+          { name: "番茄", note: "番茄蛋汤，维C丰富" },
+          { name: "冬瓜", note: "清淡利水，煮汤为主" },
+          { name: "丝瓜/南瓜", note: "好消化，蒸煮为主" },
+          { name: "芹菜/莴笋", note: "高纤维，助消化" },
+        ],
+      },
+      {
+        group: "主食",
+        emoji: "🍚",
+        foods: [
+          { name: "白米饭/粥", note: "最安全的主食" },
+          { name: "面条", note: "清汤面，不加油" },
+          { name: "馒头/花卷", note: "蒸制，不煎炸" },
+          { name: "红薯/山药", note: "蒸煮，替代部分主食" },
+          { name: "小米粥", note: "养胃，适合早餐" },
+        ],
+      },
+      {
+        group: "水果（适量）",
+        emoji: "🍎",
+        foods: [
+          { name: "苹果", note: "每天1个，温和不刺激" },
+          { name: "香蕉", note: "补钾，但不宜过多" },
+          { name: "猕猴桃", note: "维C含量高，促进铁吸收" },
+          { name: "蓝莓/草莓", note: "抗氧化，适量食用" },
+          { name: "橙子", note: "维C丰富，饭后食用" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "avoid",
+    icon: "🚫",
+    title: "严格避免",
+    subtitle: "高脂 · 刺激 · 产气",
+    color: "#c1121f",
+    bgColor: "#fde8e8",
+    items: [
+      {
+        group: "高脂肪食物（最重要！）",
+        emoji: "⛔",
+        foods: [
+          { name: "猪蹄/排骨汤", note: "月子里常喝的但现在必须停" },
+          { name: "鸡汤/骨头汤（浓汤）", note: "汤面上有油花的全不行" },
+          { name: "五花肉/肥肉", note: "所有肥肉都不吃" },
+          { name: "油炸食品", note: "炸鸡、油条、煎饺等全部避免" },
+          { name: "奶油蛋糕/甜点", note: "黄油、奶油、起酥类" },
+          { name: "坚果大量食用", note: "少量几颗可以，一把就太多" },
+        ],
+      },
+      {
+        group: "刺激性食物",
+        emoji: "🌶️",
+        foods: [
+          { name: "辛辣食物", note: "火锅、麻辣烫、辣椒" },
+          { name: "咖啡/浓茶", note: "刺激胆囊收缩" },
+          { name: "酒类", note: "任何含酒精饮品" },
+          { name: "碳酸饮料", note: "术前尤其避免" },
+          { name: "生冷刺激", note: "冰淇淋、冷饮" },
+        ],
+      },
+      {
+        group: "容易产气的食物",
+        emoji: "💨",
+        foods: [
+          { name: "牛奶（如果乳糖不耐）", note: "可以用酸奶替代" },
+          { name: "豆类（大量）", note: "少量豆腐可以，大量黄豆不行" },
+          { name: "洋葱/大蒜（大量）", note: "调味少量可以" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "sample",
+    icon: "📋",
+    title: "每日食谱参考",
+    subtitle: "术前一周这样吃",
+    color: "#1d4e89",
+    bgColor: "#dbe7f6",
+    items: [
+      {
+        group: "早餐 7:00-8:00",
+        emoji: "🌅",
+        foods: [
+          { name: "选择A", note: "小米粥 + 水煮蛋 + 清炒菠菜" },
+          { name: "选择B", note: "白粥 + 蒸蛋羹 + 猪肝粥（小碗）" },
+          { name: "选择C", note: "面条（清汤） + 水煮蛋 + 凉拌木耳" },
+        ],
+      },
+      {
+        group: "午餐 11:30-12:30",
+        emoji: "☀️",
+        foods: [
+          { name: "选择A", note: "米饭 + 清蒸鲈鱼 + 西兰花 + 番茄蛋汤" },
+          { name: "选择B", note: "米饭 + 鸡胸肉炒芹菜 + 冬瓜汤" },
+          { name: "选择C", note: "米饭 + 虾仁豆腐 + 蒜蓉菜心 + 紫菜汤" },
+        ],
+      },
+      {
+        group: "下午加餐 15:00",
+        emoji: "🍎",
+        foods: [
+          { name: "水果", note: "1个苹果 或 1个猕猴桃 或 小份草莓" },
+          { name: "酸奶", note: "原味无糖酸奶一小杯（如耐受）" },
+        ],
+      },
+      {
+        group: "晚餐 17:30-18:30",
+        emoji: "🌙",
+        foods: [
+          { name: "选择A", note: "山药粥 + 清炒虾仁 + 蒸南瓜" },
+          { name: "选择B", note: "米饭（小碗） + 鸭血豆腐汤 + 炒丝瓜" },
+          { name: "选择C", note: "面条 + 瘦牛肉炖胡萝卜 + 凉拌黄瓜" },
+        ],
+      },
+      {
+        group: "术前一天",
+        emoji: "⚠️",
+        foods: [
+          { name: "白天", note: "正常清淡饮食，不要刻意饿肚子" },
+          { name: "晚餐", note: "清淡易消化，如粥+蒸蛋，不要吃太饱" },
+          { name: "术前禁食", note: "按医嘱，通常术前8小时禁食、2小时禁水" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "tips",
+    icon: "💡",
+    title: "特别提醒",
+    subtitle: "结合你的情况",
+    color: "#7b2d8e",
+    bgColor: "#f3e5f5",
+    items: [
+      {
+        group: "针对胆囊结石",
+        emoji: "🎯",
+        foods: [
+          { name: "每日脂肪摄入控制在30g以内", note: "大约2勺油的量" },
+          { name: "做菜少油", note: "蒸、煮、炖、凉拌为主，炒菜少放油" },
+          { name: "规律进食，不要跳餐", note: "空腹反而让胆汁浓缩加重结石" },
+          { name: "晚餐不要太晚", note: "睡前3小时不进食" },
+        ],
+      },
+      {
+        group: "针对产后经期补铁",
+        emoji: "💪",
+        foods: [
+          { name: "动物性铁 > 植物性铁", note: "猪肝、鸭血吸收率远高于红枣菠菜" },
+          { name: "维C促进铁吸收", note: "吃含铁食物时搭配番茄、橙子、猕猴桃" },
+          { name: "避免茶和咖啡", note: "抑制铁吸收，饭前后1小时内不喝" },
+          { name: "可以补充铁剂", note: "如医生开了铁剂，饭后服用减少胃部不适" },
+        ],
+      },
+      {
+        group: "烹饪方法优先级",
+        emoji: "👩‍🍳",
+        foods: [
+          { name: "首选：蒸", note: "最少油脂，营养保留好" },
+          { name: "推荐：煮/炖", note: "清汤煮制，不加多余油" },
+          { name: "可以：凉拌", note: "少量香油或醋调味" },
+          { name: "少用：炒", note: "如果炒，控制油量在一小勺以内" },
+          { name: "禁止：煎/炸/红烧", note: "油脂含量太高" },
+        ],
+      },
+    ],
+  },
+];
+
+export default function DietPlan() {
+  const [activeTab, setActiveTab] = useState("recommend");
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  const toggleGroup = (catId, groupIdx) => {
+    const key = `${catId}-${groupIdx}`;
+    setExpandedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const activeCat = categories.find((c) => c.id === activeTab);
+
+  return (
+    <div
+      style={{
+        fontFamily:
+          '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif',
+        maxWidth: 480,
+        margin: "0 auto",
+        background: "linear-gradient(180deg, #fefae0 0%, #fff 30%)",
+        minHeight: "100vh",
+        paddingBottom: 32,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: "28px 20px 16px",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: 14, color: "#888", letterSpacing: 2, marginBottom: 4 }}>
+          术前饮食指南
+        </div>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: "#2d3436",
+            margin: "4px 0",
+            lineHeight: 1.3,
+          }}
+        >
+          胆囊切除术前饮食清单
+        </h1>
+        <p
+          style={{
+            fontSize: 13,
+            color: "#636e72",
+            margin: "8px 0 0",
+            lineHeight: 1.6,
+          }}
+        >
+          低脂护胆囊 · 补铁备手术 · 营养促恢复
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          padding: "0 12px",
+          overflowX: "auto",
+          scrollbarWidth: "none",
+        }}
+      >
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveTab(cat.id)}
+            style={{
+              flex: "1 0 auto",
+              padding: "10px 10px",
+              border: "none",
+              borderRadius: 12,
+              fontSize: 13,
+              fontWeight: activeTab === cat.id ? 700 : 500,
+              color: activeTab === cat.id ? "#fff" : "#555",
+              background:
+                activeTab === cat.id ? cat.color : "rgba(0,0,0,0.04)",
+              cursor: "pointer",
+              transition: "all 0.25s ease",
+              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              justifyContent: "center",
+            }}
+          >
+            <span style={{ fontSize: 15 }}>{cat.icon}</span>
+            {cat.title}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "16px 16px 0" }}>
+        <div
+          style={{
+            background: activeCat.bgColor,
+            borderRadius: 16,
+            padding: "14px 16px",
+            marginBottom: 12,
+            borderLeft: `4px solid ${activeCat.color}`,
+          }}
+        >
+          <span style={{ fontSize: 13, color: activeCat.color, fontWeight: 600 }}>
+            {activeCat.subtitle}
+          </span>
+        </div>
+
+        {activeCat.items.map((group, gIdx) => {
+          const key = `${activeCat.id}-${gIdx}`;
+          const isExpanded = expandedGroups[key] !== false;
+
+          return (
+            <div
+              key={gIdx}
+              style={{
+                background: "#fff",
+                borderRadius: 14,
+                marginBottom: 10,
+                overflow: "hidden",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+              }}
+            >
+              <button
+                onClick={() => toggleGroup(activeCat.id, gIdx)}
+                style={{
+                  width: "100%",
+                  padding: "14px 16px",
+                  border: "none",
+                  background: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 20 }}>{group.emoji}</span>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 650,
+                      color: "#2d3436",
+                    }}
+                  >
+                    {group.group}
+                  </span>
+                </span>
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: "#aaa",
+                    transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {isExpanded && (
+                <div style={{ padding: "0 16px 12px" }}>
+                  {group.foods.map((food, fIdx) => (
+                    <div
+                      key={fIdx}
+                      style={{
+                        display: "flex",
+                        padding: "10px 0",
+                        borderTop:
+                          fIdx > 0 ? "1px solid rgba(0,0,0,0.04)" : "none",
+                        gap: 10,
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: activeCat.color,
+                          marginTop: 7,
+                          flexShrink: 0,
+                          opacity: 0.6,
+                        }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: "#2d3436",
+                            marginBottom: 2,
+                          }}
+                        >
+                          {food.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "#888",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {food.note}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div
+        style={{
+          padding: "20px 20px 8px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: "#aaa",
+            lineHeight: 1.8,
+            padding: "12px",
+            background: "rgba(0,0,0,0.02)",
+            borderRadius: 10,
+          }}
+        >
+          ⚠️ 本清单仅供参考，请结合主治医生建议调整
+          <br />
+          术前禁食禁水时间以医嘱为准
+        </div>
+      </div>
+    </div>
+  );
+}
